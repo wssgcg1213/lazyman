@@ -21,16 +21,22 @@ class NewsController extends Controller {
      */
     public function index () {
         $page = I('get.page', 0, 'int');
-        $data = $this->NewsModel->getHeadNews($page * 15);
-
-        $ret = array(
-            "status" => 200,
-            "info" => "success",
-            "page" => $page,
-            "data" => $data
-        );
-
-        $this->ajaxReturn( $ret );
+        return $this->wrap($this->NewsModel->getHeadNews($page * 15), $page);
+    }
+    public function headline () {
+        return $this->index();
+    }
+    public function entertain () {
+        $page = I('get.page', 0, 'int');
+        return $this->wrap($this->NewsModel->getEntertainNews($page * 15), $page);
+    }
+    public function social () {
+        $page = I('get.page', 0, 'int');
+        return $this->wrap($this->NewsModel->getSocialNews($page * 15), $page);
+    }
+    public function tech () {
+        $page = I('get.page', 0, 'int');
+        return $this->wrap($this->NewsModel->getTechNews($page * 15), $page);
     }
 
     public function h5News() {
@@ -40,4 +46,17 @@ class NewsController extends Controller {
         $this->assign('news', $news);
         $this->display();
     }
+
+    private function wrap($data, $page) {
+        $ret = array(
+            "status" => 200,
+            "info" => "success",
+            "page" => $page,
+            "data" => $data
+        );
+
+        return $this->ajaxReturn( $ret );
+    }
+
+
 }

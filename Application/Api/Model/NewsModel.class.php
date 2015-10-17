@@ -12,35 +12,72 @@ use Think\Model;
 
 class NewsModel extends Model {
     protected $tableName = 'news';
+    protected $_types = array(
+        "headline" => "T1295501906343",
+        "tech" => "T1295507084100",
+        "entertain" => "T1295506658957",
+        "social" => "T1295505301714"
+    );
+
     /*
      * 获取头条新闻
      */
     public function getHeadNews ($start = 0, $length = 15) {
         $_end = (int)$start + (int)$length;
-        $headNewsUrl = "http://c.m.163.com/nc/article/headline/T1348647853363/$start-$_end.html";
-        $headNewsString = $this->curl($headNewsUrl);
-        if ( !$headNewsString ) {return '';}
-        $headNewsRaw = json_decode($headNewsString, true);
-        $headNews = array();
+        return $this->_getNewsByType("headline", $start, $_end);
+    }
 
-        foreach ($headNewsRaw['T1348647853363'] as $_news) {
+    /*
+     * 获取娱乐新闻
+     */
+    public function getEntertainNews ($start = 0, $length = 15) {
+        $_end = (int)$start + (int)$length;
+        return $this->_getNewsByType("entertain", $start, $_end);
+    }
+
+    /*
+    * 获取科技新闻
+    */
+    public function getTechNews ($start = 0, $length = 15) {
+        $_end = (int)$start + (int)$length;
+        return $this->_getNewsByType("tech", $start, $_end);
+    }
+
+    /*
+    * 获取社会新闻
+    */
+    public function getSocialNews ($start = 0, $length = 15) {
+        $_end = (int)$start + (int)$length;
+        return $this->_getNewsByType("social", $start, $_end);
+    }
+
+    private function _getNewsByType ($type, $start, $end) {
+        $_listId = $this->_types[$type];
+        $url = "http://c.m.163.com/nc/article/list/$_listId/$start-$end.html";
+        $newsString = $this->curl($url);
+        if ( !$newsString ) {return '';}
+        $newsRaw = json_decode($newsString, true);
+        $news = array();
+
+        foreach ($newsRaw[$_listId] as $_news) {
             if ($_news['template'] == 'manual') continue;
 
-            $headNews[] = array(
+            $news[] = array(
                 "title" => $_news['title'],
                 "content" => $_news['digest'],
                 "ts" => strtotime($_news['ptime']),
                 "imgUrl" => $_news['imgsrc'],
                 "docid" => $_news['docid'],
-                "h5Url" => U("News/h5News?docid=".$_news['docid'])
+                "h5Url" => U("News/h5News?docid=".$_news['docid']),
+                "type" => "$type"
             );
         }
-        //formatted $headNews
+        //formatted $news
 
-        if (!empty($headNews[0]) && $this->getFirstNewsTs() !== $headNews[0]['ts']) {
-            $this->saveHeadNews($headNews);//保存到数据库
+        if (!empty($news[0]) && $this->getFirstNewsTs() !== $news[0]['ts']) {
+            $this->saveHeadNews($news);//保存到数据库
         }
-        return $headNews;
+        return $news;
     }
 
     private function curl($url, $timeout = 30) {
