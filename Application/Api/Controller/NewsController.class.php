@@ -39,6 +39,25 @@ class NewsController extends Controller {
         return $this->wrap($this->NewsModel->getTechNews($page * 15), $page);
     }
 
+    /**
+     * 获取资讯版块热门数据
+     */
+    public function hotMessage () {
+        $data = array();
+        $newsModel = M('news');
+        $data[] = $newsModel->where('type="headline"')->order('ts desc')->find();
+        $data[] = $newsModel->where('type="social"')->order('ts desc')->find();
+        $data[] = $newsModel->where('type="entertain"')->order('ts desc')->find();
+        $data[] = $newsModel->where('type="tech"')->order('ts desc')->find();
+        $ret = array(
+            "status" => 200,
+            "info" => "success",
+            "data" => $data
+        );
+
+        return $this->ajaxReturn( $ret );
+    }
+
     public function h5News() {
         $docid = I('get.docid');
         if (!$docid ) return die('empty docid');

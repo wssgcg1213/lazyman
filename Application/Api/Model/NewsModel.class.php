@@ -62,7 +62,7 @@ class NewsModel extends Model {
         foreach ($newsRaw[$_listId] as $_news) {
             if ($_news['template'] == 'manual') continue;
 
-            $news[] = array(
+            $_item = array(
                 "title" => $_news['title'],
                 "content" => $_news['digest'],
                 "ts" => strtotime($_news['ptime']),
@@ -71,6 +71,10 @@ class NewsModel extends Model {
                 "h5Url" => U("News/h5News?docid=".$_news['docid']),
                 "type" => "$type"
             );
+            $news[] = $_item;
+            if ( !$this->where(array("docid" => $_item['docid']))->find() ){
+                $this->add($_item);
+            }
         }
         //formatted $news
 
