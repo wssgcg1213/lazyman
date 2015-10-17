@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{$news['title']}</title>
+</head>
+<body>
+<h1 class="title"></h1>
+<article class="content"></article>
+<footer></footer>
+<script src="https://a.alipayobjects.com/amui/zepto/1.1.3/zepto.js"></script>
+<script>
+    var newsBody = "{$news['body']}",
+        newsTitle = "{$news['title']}";
+
+    $('.title').text(newsTitle);
+    $('.content').html(newsBody);
+
+    //todo 渲染
+    function LTemplate(str) {
+        this.rawString = str;
+        this.render = function () {}
+    }
+    LTemplate.prototype.parse = function (str) {
+
+    }
+    LTemplate.prototype.render = function (plainObj) {
+
+    }
+
+</script>
+</body>
+</html>
